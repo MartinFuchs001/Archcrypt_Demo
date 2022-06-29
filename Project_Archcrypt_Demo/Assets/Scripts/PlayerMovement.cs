@@ -14,10 +14,14 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool isGrounded = false;
+    private Animator anim;
+    private Vector3 playerRotation;
 
     void Start()
     {
-       rb = GetComponent<Rigidbody2D>(); 
+       rb = GetComponent<Rigidbody2D>();
+       anim = GetComponent<Animator>();
+       playerRotation = transform.eulerAngles;
     }
 
     // Update is called once per frame
@@ -26,19 +30,25 @@ public class PlayerMovement : MonoBehaviour
         if(Input.GetKey(KeyCode.D))
         {
             buttonPressed = RIGHT;
+            anim.SetBool("isRunning", true);
+            //transform.eulerAngles = playerRotation;
         }
         else if(Input.GetKey(KeyCode.A))
         {
             buttonPressed = LEFT;
+            anim.SetBool("isRunning", true);
+           // transform.eulerAngles = playerRotation - new Vector3(0, 180, 0);
         }
         else
         {
             buttonPressed = null;
+            anim.SetBool("isRunning", false);
         } 
       
         if(Input.GetKeyDown(KeyCode.Space) && isGrounded == true)
         {
             isGrounded = false;
+            anim.SetBool("isJumping", true);
             rb.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
         }
     }
@@ -47,11 +57,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if(buttonPressed == RIGHT)
         {
+            transform.eulerAngles = playerRotation;
             transform.position += transform.right * (Time.deltaTime * moveSpeed);
         }
         else if(buttonPressed == LEFT)
         {
-            transform.position -= transform.right * (Time.deltaTime * moveSpeed);
+            transform.eulerAngles = playerRotation - new Vector3(0, 180, 0);
+            transform.position += transform.right * (Time.deltaTime * moveSpeed);
         }
     }
 
@@ -59,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(collision.gameObject.tag == "Ground")
         {
+            anim.SetBool("isJumping", false);
             isGrounded = true;
         }
     }
